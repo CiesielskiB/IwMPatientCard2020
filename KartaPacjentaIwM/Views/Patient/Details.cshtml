@@ -1,0 +1,245 @@
+﻿@model KartaPacjentaIwM.Models.DetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Patient information</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.Surname)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.Surname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.Gender)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.Gender)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.BirthDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.BirthDate)
+        </dd>
+        @if (!String.IsNullOrEmpty(Model.Patient.Address))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Patient.Address)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Patient.Address)
+            </dd>
+        }
+        @if (!String.IsNullOrEmpty(Model.Patient.City))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Patient.City)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Patient.City)
+            </dd>
+        }
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.VersionId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.VersionId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.Active)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.Active)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Patient.LastUpdated)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Patient.LastUpdated)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<h1>Observations timeline</h1>
+<form asp-controller="Patient" asp-action="Details" method="get">
+    from :
+    @Html.DropDownListFor(model => model.FromMonthObs, (IEnumerable<SelectListItem>)ViewBag.Months)
+    @Html.DropDownListFor(model => model.FromYearObs, (IEnumerable<SelectListItem>)ViewBag.YearsObs)
+    to :
+    @Html.DropDownListFor(model => model.ToMonthObs, (IEnumerable<SelectListItem>)ViewBag.Months)
+    @Html.DropDownListFor(model => model.ToYearObs, (IEnumerable<SelectListItem>)ViewBag.YearsObs)
+    <input type="hidden" name="FromMonthMed" value="@Model.FromMonthMed" />
+    <input type="hidden" name="toMonthMed" value="@Model.ToMonthMed" />
+    <input type="hidden" name="FromYearMed" value="@Model.FromYearMed" />
+    <input type="hidden" name="ToYearMed" value="@Model.ToYearMed" />
+    <button type="submit" class="btn btn-primary ml-3 mb-3">Filter</button>
+    <div class="row ml-1 mb-2 text-danger">
+        @Html.ValidationMessageFor(m => m.FromMonthObs)
+    </div>
+</form>
+<div id="obeservations">
+</div>
+<div class="mt-3">
+    <h4>Show chart for parameter in selected observations period</h4>
+    <select id="chartSelect" onchange="ChangeChartTarget()">
+        <option value=""></option>
+        @foreach (var item in Model.Observations.Where(x => !String.IsNullOrEmpty(x.Unit)).Select(x => new { Name = x.Text }).Distinct().ToList())
+        {
+            <option value="@item.Name">@item.Name</option>
+        }
+    </select>
+</div>
+<div id="canvasContainer">
+    <canvas id="observationChart" width="400" height="400"></canvas>
+</div>
+
+
+
+
+<h1>Medication requests timeline</h1>
+<form asp-controller="Patient" asp-action="Details" method="get">
+    from :
+    @Html.DropDownListFor(model => model.FromMonthMed, (IEnumerable<SelectListItem>)ViewBag.Months)
+    @Html.DropDownListFor(model => model.FromYearMed, (IEnumerable<SelectListItem>)ViewBag.YearsMed)
+    to :
+    @Html.DropDownListFor(model => model.ToMonthMed, (IEnumerable<SelectListItem>)ViewBag.Months)
+    @Html.DropDownListFor(model => model.ToYearMed, (IEnumerable<SelectListItem>)ViewBag.YearsMed)
+    <input type="hidden" name="FromMonthObs" value="@Model.FromMonthObs" />
+    <input type="hidden" name="toMonthObs" value="@Model.ToMonthObs" />
+    <input type="hidden" name="FromYearObs" value="@Model.FromYearObs" />
+    <input type="hidden" name="ToYearObs" value="@Model.ToYearObs" />
+    <button type="submit" class="btn btn-primary ml-3 mb-3">Filter</button>
+    <div class="row ml-1 mb-2 text-danger">
+        @Html.ValidationMessageFor(m => m.ToMonthMed)
+    </div>
+</form>
+<div id="medications">
+</div>
+
+    <script type="text/javascript">
+    function ChangeChartTarget() {
+        var selected = document.getElementById("chartSelect").value;
+        if (selected !== "") {
+                var rawDataForChart = @Html.Raw(Json.Serialize(Model.Observations.Select(x => new
+            {
+                t = x.IssuedDate,
+                y = x.Value,
+                text = x.Text,
+                unit = x.Unit
+            })));
+
+            var filteredDataForChart = rawDataForChart.filter(function (x) {
+              return x.text === selected
+            });
+            var unitValue = filteredDataForChart[0].unit
+            $('#observationChart').remove();
+            $('#canvasContainer').append('<canvas id="observationChart"  width="400" height="400"><canvas>');
+            var ctx = document.getElementById('observationChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: filteredDataForChart.map(function (x) { return x.t.toString() }),
+                    datasets: [{
+                        label: selected,
+                        data: filteredDataForChart
+                    }]
+                },
+                options: {
+                maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    text: selected
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        distribution: 'linear'
+                    }],
+                    yAxes: [{
+                      scaleLabel: {
+                        display: true,
+                        labelString: unitValue
+                      }
+                    }]
+                }
+            }
+            });
+        }
+    }
+
+    function onSelectObservation(properties) {
+        window.location.href = 'https://localhost:44307/Patient/ObservationDetails/' + properties.items[0]
+    }
+    // DOM element where the Timeline will be attached
+    var container = document.getElementById('obeservations');
+    var data = @Html.Raw(Json.Serialize(Model.Observations.Select(x => new
+          {
+              id = x.Id,
+              content = x.Text,
+              start = x.IssuedDate
+          })));
+    // Create a DataSet (allows two way data-binding)
+    var items = new vis.DataSet(data);
+    var minDate = @Model.EarliestObservationDate.DateTime.Year-1;
+    var maxDate = @Model.LatestObservationDate.DateTime.Year+2;
+    // Configuration for the Timeline
+    var options = {
+        height: '800px',
+        min: new Date(minDate, 0, 1),                // lower limit of visible range
+        max: new Date(maxDate, 0, 1),                // upper limit of visible range
+        clickToUse: true,
+
+    };
+    // Create a Timeline
+    var timelineObs = new vis.Timeline(container, items, options);
+    timelineObs.on('select', onSelectObservation);
+
+    function onSelectMedication(properties) {
+        console.log(properties.items);
+        window.location.href = 'https://localhost:44307/Patient/MedicationRequestDetails/' + properties.items[0]
+    }
+    // DOM element where the Timeline will be attached
+    var container = document.getElementById('medications');
+    var data = @Html.Raw(Json.Serialize(Model.MedicationRequests.Select(x => new
+          {
+              id = x.Id,
+              content = x.Text,
+              start = x.AuthoredOn
+          })));
+    // Create a DataSet (allows two way data-binding)
+    var items = new vis.DataSet(data);
+    var minDateMed = @Model.EarliestMediacationRequestDate.DateTime.Year-1;
+    var maxDateMed = @Model.LatestMediacationRequestDate.DateTime.Year+2;
+    // Configuration for the Timeline
+    var options = {
+        height: '800px',
+        min: new Date(minDateMed, 0, 1),                // lower limit of visible range
+        max: new Date(maxDateMed, 0, 1),                // upper limit of visible range
+        clickToUse: true,
+    };
+    // Create a Timeline
+    var timelineMed = new vis.Timeline(container, items, options);
+    timelineMed.on('select', onSelectMedication);
+    </script>

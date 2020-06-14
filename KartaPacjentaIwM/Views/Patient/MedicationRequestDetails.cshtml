@@ -1,0 +1,85 @@
+﻿@model KartaPacjentaIwM.Models.MedicationModel
+
+@{
+    ViewData["Title"] = "MedicationRequestDetails";
+}
+
+<h1>Medication Request Details</h1>
+
+<div>
+    <h4>Medication request informations</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VersionId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.VersionId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Text)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Text)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SubjectId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SubjectId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Practitioner)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Practitioner)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AuthoredOn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AuthoredOn)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Intent)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Intent)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DosageInstructions)
+        </dt>
+        <dd class="col-sm-10">
+            <ul>
+                @foreach (var instruction in Model.DosageInstructions)
+                {
+                    @if (instruction.AsNeeded.ToString() == "true")
+                    {
+                        <li>Take as needed : Yes </li>
+                    }
+                    else
+                    {
+                        <li>Take as needed : No </li>
+                    }
+
+                }
+            </ul>
+           
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Patient details", "Details", new { id = Model.SubjectId })
+</div>

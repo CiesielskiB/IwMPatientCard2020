@@ -1,0 +1,53 @@
+﻿@model KartaPacjentaIwM.Models.ObservationModel
+
+@{
+    ViewData["Title"] = "Observation details";
+}
+
+<h1>Observation details</h1>
+
+<div>
+    <h4>Observation informations</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.VersionId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.VersionId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Text)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Text)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SubjectId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SubjectId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IssuedDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IssuedDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Value) 
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Value) @Html.DisplayNameFor(model => model.Unit)
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Patient details", "Details", new { id = Model.SubjectId })
+</div>
